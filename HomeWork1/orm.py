@@ -113,7 +113,7 @@ class Manage:
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM {table_name}".format(table_name = self.table_name))
         return cursor.fetchall()
-        cursor.close()
+
 
 
     def delete(self, **kwargs):
