@@ -8,6 +8,7 @@ import qrcode
 import os
 from multiprocessing import Process, Queue
 from time import sleep
+import time
 
 
 token = ''
@@ -69,19 +70,19 @@ class Vk_qr:
         longpoll = VkLongPoll(vk2)
         upload = VkUpload(vk)
 
-        attachments = [] 
-        photo = upload.photo(q.get(), album_id='', group_id='')
-        attachments.append('photo{}_{}'.format(photo[0]['owner_id'], photo[0]['id']))
-
         while True:
-            for event in longpoll.listen():
-                if event.type == VkEventType.MESSAGE_NEW:
-                    if event.to_me:
-                        vk_session2.messages.send(user_id=event.user_id, 
+            attachments = []
+
+            name = q.get()
+
+            photo = upload.photo(name, album_id='', group_id='')
+            attachments.append('photo{}_{}'.format(photo[0]['owner_id'],photo[0]['id']))
+
+            vk_session2.messages.send(user_id='', 
                                                 attachment=','.join(attachments), 
                                                 message='Ваш код', 
                                                 random_id=randint(1, 999999))
-    
+            sleep(3)
 
 
 to = Vk_qr()
@@ -91,12 +92,13 @@ def main(q):
         to.do_qr_code(q)
         sleep(0.7)
 
-if __name__ == '__main__':
+
+if __name__ == '__main__': 
     q = Queue()
-    for i in range(3):
+    for i in range(7):
         proc = Process(target=main, args=(q, ))
         proc.start()
     to.mess(q)
-    
-    
+
+
 
